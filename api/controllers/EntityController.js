@@ -1,33 +1,10 @@
-var connection = {
-    client: 'pg',
-    connection: {
-        host: 'localhost',
-        port: 5432,
-        user: 'postgres',
-        password: '55555',
-        database: 'casa'
-    }
-};
-var knex = require('knex')(connection);
+var connection = require('../models/models');
+var knex = require('knex')(connection.connection);
 var bookShelf = require('bookshelf')(knex);
+var Entity = connection.Entity;
+var Fields = connection.Fields;
 
-var Entity = bookShelf.Model.extend({
-    tableName: 'entity',
-    fields: function() {
-        return this.hasMany(Fields);
-    }
-});
-
-var Fields = bookShelf.Model.extend({
-    tableName: 'fields',
-    entity: function() {
-        return this.belongsTo(Entity);
-    }
-});
-
-var _ = require('lodash');
 module.exports = {
-
 
     create: function(req, res) {
 
@@ -45,7 +22,6 @@ module.exports = {
 
         var id = req.param('id');
         console.log(id);
-
         Entity.where({ id: id }).fetch({ withRelated: ['fields'] }).then(function(model) {
             console.log(model.toJSON());
             res.json(model.toJSON());
@@ -53,29 +29,11 @@ module.exports = {
             res.send(err);
         });
 
-
-        // new Entity({ id: id })
-        //     .fetch({ withRelated: ['fields'] }).then(function(model) {
-        //         console.log(model.toJSON());
-        //         res.json(model.toJSON());
-        //     }).catch(function(err) {
-        //         res.send(err);
-        //     });
-
     },
 
     update: function(req, res) {
+
         var id = req.param('id');
-        console.log(id);
-        // Entity.where({ id: id }).save({
-        //         name: 'updated Entity'
-        //     }).then(function(station) {
-        //         res.json(station.toJSON());
-        //     }).catch(function(err) {
-        //         res.send(err);
-        //     });
-
-
         new Entity({ 'id': id })
             .save({
                 name: 'updated Entity'
@@ -87,6 +45,7 @@ module.exports = {
     },
 
     delete: function(req, res) {
+
         var id = req.param('id');
         Fields.where({ entity_id: id }).destroy().then(function(author) {
             new Entity({ id: id })

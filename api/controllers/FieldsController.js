@@ -1,38 +1,15 @@
-var connection = {
-    client: 'pg',
-    connection: {
-        host: 'localhost',
-        port: 5432,
-        user: 'postgres',
-        password: '55555',
-        database: 'casa'
-    }
-};
-var knex = require('knex')(connection);
+var connection = require('../models/models');
+var knex = require('knex')(connection.connection);
 var bookShelf = require('bookshelf')(knex);
-
-var Entity = bookShelf.Model.extend({
-    tableName: 'entity',
-    fields: function() {
-        return this.hasMany(Fields);
-    }
-});
-
-var Fields = bookShelf.Model.extend({
-    tableName: 'fields',
-    entity: function() {
-        return this.belongsTo(Entity);
-    }
-});
-
-
+var Entity = connection.Entity;
+var Fields = connection.Fields;
 
 module.exports = {
 
 
     create: function(req, res) {
 
-        new Fields({ name: req.param('name'), type: req.param('type'), entity_id: req.param('entity_id')})
+        new Fields({ name: req.param('name'), type: req.param('type'), entity_id: req.param('entity_id') })
             .save().then(function(model) {
                 console.log("inserted");
                 res.json(model.toJSON());
@@ -42,8 +19,8 @@ module.exports = {
     },
 
     show: function(req, res) {
-        var id = req.param('id');
 
+        var id = req.param('id');
         Fields.where({ id: id }).fetch().then(function(model) {
             console.log(model.toJSON());
             res.json(model.toJSON());
@@ -54,8 +31,8 @@ module.exports = {
     },
 
     update: function(req, res) {
-        var id = req.param('id');
 
+        var id = req.param('id');
         new Fields({ id: id })
             .save({
                 name: 'updated Fields',
@@ -68,9 +45,9 @@ module.exports = {
     },
 
     delete: function(req, res) {
+    	
         var id = req.param('id');
-
-         Fields.where({ id: id }).destroy()
+        Fields.where({ id: id }).destroy()
             .then(function(model) {
                 res.json("deleted");
             }).catch(function(err) {
@@ -80,4 +57,3 @@ module.exports = {
     }
 
 }
-
