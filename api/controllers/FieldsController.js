@@ -30,39 +30,54 @@ var Fields = bookShelf.Model.extend({
 module.exports = {
 
 
-	create:function (req,res) {
-	 	new Fields({ name: 'Next Fields', type:'string', entity_id: 1})
+    create: function(req, res) {
+
+        new Fields({ name: req.param('name'), type: req.param('type'), entity_id: req.param('entity_id')})
             .save().then(function(model) {
                 console.log("inserted");
                 res.json(model.toJSON());
+            }).catch(function(err) {
+                res.send(err);
             });
-	 },
+    },
 
-	 show:function (req,res) {
-	 	new Fields({ 'id': '1' })
-            .fetch()
-            .then(function(model) {
-                console.log(model.get('name'));
-                res.json(model.toJSON());
-            });
-	 },
+    show: function(req, res) {
+        var id = req.param('id');
 
-	 update:function (req,res) {
-	 	 new Fields({ 'id': 1 })
+        Fields.where({ id: id }).fetch().then(function(model) {
+            console.log(model.toJSON());
+            res.json(model.toJSON());
+        }).catch(function(err) {
+            res.send(err);
+        });
+
+    },
+
+    update: function(req, res) {
+        var id = req.param('id');
+
+        new Fields({ id: id })
             .save({
-                name: 'updated Fields', 
-                type:'string'
+                name: 'updated Fields',
+                type: 'string'
             }).then(function(station) {
                 res.json(station.toJSON());
+            }).catch(function(err) {
+                res.send(err);
             });
-	 },
+    },
 
-	 delete:function (req,res) {
-	 	new Fields({ id: 1 })
-            .destroy()
+    delete: function(req, res) {
+        var id = req.param('id');
+
+         Fields.where({ id: id }).destroy()
             .then(function(model) {
                 res.json("deleted");
+            }).catch(function(err) {
+                res.send(err);
             });
-	 }
+
+    }
 
 }
+
